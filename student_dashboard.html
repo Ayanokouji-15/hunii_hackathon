@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesdd.css') }}">
+</head>
+<body>
+    <div class="theme-switch-wrapper">
+    <span>Dark Mode</span>
+    <label class="switch">
+        <input type="checkbox" id="theme-checkbox" onclick="toggleDark()">
+        <span class="slider"></span>
+    </label>
+</div>
+
+    <h1>Welcome, {{ session['username'] }}!</h1>
+
+    <h3>Request a New Topic</h3>
+<form action="/submit_request" method="POST">
+    <label>Specific Topic:</label><br>
+    <input type="text" name="topic_name" placeholder="e.g. Quadratic Equations, Photosynthesis" required style="width: 100%;"><br><br>
+
+    <label>Subject:</label><br>
+    <select name="subject" required style="width: 100%;">
+        <optgroup label="Core Subjects">
+            <option value="Mathematics">Mathematics</option>
+            <option value="Science">Science</option>
+            <option value="English">English</option>
+            <option value="Filipino">Filipino</option>
+            <option value="Araling Panlipunan">Araling Panlipunan (AP)</option>
+            <option value="MAPEH">MAPEH</option>
+            <option value="EsP">Edukasyon sa Pagpapakatao (EsP)</option>
+            <option value="TLE">Technology and Livelihood Education (TLE)</option>
+        </optgroup>
+        <optgroup label="Senior High School (SHS) Specialized">
+            <option value="Oral Communication">Oral Communication</option>
+            <option value="General Mathematics">General Mathematics</option>
+            <option value="Earth and Life Science">Earth and Life Science</option>
+            <option value="Komonikasyon at Pananaliksik">Komonikasyon at Pananaliksik</option>
+            <option value="Personal Development">Personal Development / PerDev</option>
+            <option value="Understanding Culture, Society and Politics">UCSP</option>
+            <option value="Introduction to Philosophy">Intro to Philosophy</option>
+            <option value="21st Century Literature">21st Century Literature</option>
+            <option value="Contemporary Philippine Arts">Contemporary Philippine Arts</option>
+            <option value="Empowerment Technologies">Empowerment Technologies (E-Tech)</option>
+        </optgroup>
+        <optgroup label="TVL / Programming">
+            <option value="Computer Programming">Computer Programming</option>
+            <option value="Animation">Animation</option>
+            <option value="Computer System Servicing">CSS</option>
+        </optgroup>
+    </select><br><br>
+
+    <label>Grade Level:</label><br>
+    <select name="grade_level" required style="width: 100%;">
+        <option value="Kindergarten">Kindergarten</option>
+        {% for i in range(1, 7) %}
+        <option value="Grade {{ i }} (Elementary)">Grade {{ i }}</option>
+        {% endfor %}
+        {% for i in range(7, 11) %}
+        <option value="Grade {{ i }} (Junior High)">Grade {{ i }}</option>
+        {% endfor %}
+        <option value="Grade 11 (Senior High)">Grade 11 (SHS)</option>
+        <option value="Grade 12 (Senior High)">Grade 12 (SHS)</option>
+        <option value="College / Undergraduate">College</option>
+    </select><br><br>
+
+    <label><strong>Inclusive Learning Support:</strong></label>
+    <div style="background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+        <input type="checkbox" name="special_tags" value="Low-Data"> Low-Data / Poor Connection<br>
+        <input type="checkbox" name="special_tags" value="Dyslexia Support"> Dyslexia Support<br>
+        <input type="checkbox" name="special_tags" value="ADHD Support"> ADHD Support<br>
+        <input type="checkbox" name="special_tags" value="Visual Support"> Visual Support<br>
+        <input type="checkbox" name="special_tags" value="Hearing Support"> Hearing Support<br>
+        <input type="checkbox" name="special_tags" value="Slow-Paced"> Slow-Paced Learning<br>
+    </div><br>
+
+    <label>Additional Instructions:</label><br>
+    <textarea name="description" placeholder="Mention specific chapters or difficult areas..." required style="width: 100%; height: 80px;"></textarea><br><br>
+    
+    <button type="submit" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        Submit Request
+    </button>
+</form>
+
+    <hr>
+
+<h3>My Request History</h3>
+<table border="1">
+    <tr>
+        <th>Topic</th>
+        <th>Category & Tags</th> <th>Description</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    {% for req in requests %}
+    <tr>
+        <td>{{ req.topic_name }}</td>
+        <td>
+            {% if req.tags and req.tags != "" %}
+                {% for tag in req.tags.split(',') %}
+                    <span style="background-color: #e9ecef; color: #333; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin: 2px; border: 1px solid #ccc; display: inline-block;">
+                        {{ tag.strip() }}
+                    </span>
+                {% endfor %}
+            {% else %}
+                <small style="color: #999;"><i>No tags provided</i></small>
+            {% endif %}
+        </td>
+        <td>{{ req.description }}</td>
+        <td>
+            <span class="status-{{ req.status }}">
+                {{ req.status | capitalize }}
+            </span>
+        </td>
+        <td>
+            {% if req.status == 'pending' %}
+            <form action="{{ url_for('cancel_request', request_id=req.request_id) }}" method="POST" style="display:inline;">
+                <button type="submit" onclick="return confirm('Cancel this request?')">Cancel</button>
+            </form>
+            {% else %}
+            <em>N/A</em>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+    <hr>
+
+<h3>My Enrolled Sessions</h3>
+<table border="1">
+    <tr>
+        <th>Topic</th>
+        <th>Instructor</th>
+        <th>Date/Time</th>
+        <th>Class Size</th>
+        <th>Actions</th> </tr>
+    {% for s in confirmed %}
+    <tr>
+        <td>{{ s.topic_name }}</td>
+        <td>{{ s.instructor_name }}</td>
+        <td>{{ s.date_time }}</td>
+        <td>{{ s.current_enrollment }} / {{ s.max_slots }} Joined</td>
+        <td>
+            <a href="{{ s.zoom_link }}" target="_blank" rel="noopener noreferrer" class="zoom-btn">Join Zoom</a>
+            
+            <form action="{{ url_for('withdraw_session', session_id=s.session_id) }}" method="POST" style="display:inline;">
+                <button type="submit" onclick="return confirm('Are you sure you want to withdraw? This will open your slot to others.')" style="color: #666; font-size: 0.8em; margin-left: 10px;">
+                    Withdraw
+                </button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="5">No confirmed sessions yet.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+    <hr>
+
+    <h3>Available Sessions to Join</h3>
+    <table border="1">
+        <tr>
+            <th>Topic</th>
+            <th>Instructor</th>
+            <th>Date/Time</th>
+            <th>Slots</th>
+            <th>Action</th>
+        </tr>
+        {% for s in sessions %}
+        <tr>
+            <td>{{ s.topic_name }}</td>
+            <td>{{ s.instructor_name }}</td>
+            <td>{{ s.date_time }}</td>
+            <td>{{ s.current_enrollment }} / {{ s.max_slots }}</td>
+            <td>
+                <form action="{{ url_for('join_session', session_id=s.session_id) }}" method="POST">
+                    <button type="submit">Join</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+
+<script>
+    function toggleDark() {
+        document.body.classList.toggle("dark-mode");
+        // Save preference to localStorage
+        localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+    }
+
+    // On page load, check for saved preference
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+        const checkbox = document.getElementById("theme-checkbox");
+        if(checkbox) checkbox.checked = true;
+    }
+</script>
+
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hunii | Schedule Session</title>
+    <link rel="stylesheet" href="static/stylesd.css">
+</head>
+<body>
+    <div class="theme-switch-wrapper">
+        <span>Dark Mode</span>
+        <label class="switch">
+            <input type="checkbox" id="theme-checkbox" onclick="toggleDark()">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="dashboard-container">
+        <header style="margin-bottom: 30px;">
+            <h1>schedule</h1>
+            <p>Finalizing details for Request ID: <strong>{{ request_id }}</strong></p>
+        </header>
+
+        <div class="table-container" style="max-width: 600px; margin: 0 auto;">
+            <h3>Session Details</h3>
+            <form action="{{ url_for('accept_request', request_id=request_id) }}" method="POST">
+                
+                <label>Date & Time</label>
+                <input type="datetime-local" name="date_time" required>
+
+                <label>Zoom / Meeting Link</label>
+                <input type="url" name="zoom_link" placeholder="https://zoom.us/j/..." required>
+
+                <label>Maximum Student Slots</label>
+                <input type="number" name="max_slots" min="2" value="5" required>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" style="flex: 2;">Create Session</button>
+                    
+                    <a href="{{ url_for('instructor_dashboard') }}" class="btn-logout" style="flex: 1; text-align: center; padding: 16px 0; text-decoration: none;">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleDark() {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+        }
+        // Apply theme on load so it matches the dashboard
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark-mode");
+            if(document.getElementById("theme-checkbox")) {
+                document.getElementById("theme-checkbox").checked = true;
+            }
+        }
+    </script>
+</body>
+</html>

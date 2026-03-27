@@ -1,0 +1,133 @@
+/* --- Brand Variables (From Instructor Panel) --- */
+:root {
+    --bg: #fdfbf7;
+    --card: #ffffff;
+    --text: #2d2d2d;
+    --accent: #6b5b95; 
+    --accent-light: #b2d2a4; 
+    --yellow: #f7d060; 
+    --border: #b2d2a4;
+    --input-bg: #ffffff;
+}
+
+body.dark-mode {
+    --bg: #2d2836;
+    --card: #3d354a;
+    --text: #e1eedd;
+    --accent: #b2d2a4;
+    --border: #514663;
+    --input-bg: #4a415a;
+}
+
+/* --- Global --- */
+* { box-sizing: border-box; }
+body {
+    background-color: var(--bg) !important;
+    color: var(--text) !important;
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    margin: 0;
+    padding: 40px;
+    transition: 0.3s;
+}
+
+/* --- THE STATIC THEME SWITCHER --- */
+.theme-switch-wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex; align-items: center; gap: 12px; 
+    background: var(--card);
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 3px solid var(--border);
+    box-shadow: 5px 5px 0px var(--accent);
+}
+.theme-switch-wrapper span { font-size: 0.75rem; font-weight: bold; color: var(--accent); }
+
+.switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--accent); }
+input:checked + .slider:before { transform: translateX(22px); }
+
+/* --- BUTTONS (Sticker Look) --- */
+/* This targets your "Submit", "Join", and "Accept" buttons */
+button, .btn, .zoom-btn {
+    background: var(--yellow) !important;
+    color: #444 !important;
+    padding: 12px 25px !important;
+    border-radius: 50px !important;
+    text-decoration: none;
+    font-weight: 900;
+    display: inline-block;
+    border: 3px solid var(--text) !important; 
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 4px 4px 0px var(--text) !important;
+    font-family: inherit;
+    text-transform: lowercase;
+}
+
+button:hover, .zoom-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--text) !important;
+}
+
+/* --- TABLES & FORMS (Compatibility Overrides) --- */
+table { 
+    width: 100% !important; 
+    border-collapse: collapse !important; 
+    background: var(--card) !important;
+    border: 4px solid var(--border) !important;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+th { 
+    text-align: left; 
+    color: var(--accent) !important; 
+    padding: 15px; 
+    border-bottom: 4px solid var(--border) !important; 
+    text-transform: lowercase; 
+}
+
+td { padding: 15px; border-bottom: 2px solid var(--bg); }
+
+/* Form Elements */
+input[type="text"], select, textarea {
+    width: 100% !important;
+    padding: 14px 20px !important;
+    margin-bottom: 15px !important;
+    border: 3px solid var(--border) !important;
+    border-radius: 20px !important;
+    background-color: var(--input-bg) !important;
+    color: var(--text) !important;
+    font-family: inherit;
+}
+
+/* Stylize the Inclusive Support box in your HTML */
+div[style*="background-color: #f9f9f9"] {
+    background-color: var(--card) !important;
+    border: 3px solid var(--border) !important;
+    border-radius: 20px !important;
+    padding: 15px !important;
+}
+
+/* Dropdown styling (fixes for Dark Mode) */
+optgroup {
+    background: var(--card);
+    color: var(--accent);
+    font-weight: bold;
+}
+
+select option {
+    background: var(--card);
+    color: var(--text);
+}
+
+h1 { color: var(--accent); font-size: 3rem; margin: 0; text-transform: lowercase; text-align: center; }
+h3 { color: var(--accent); margin-top: 30px; font-size: 1.5rem; text-transform: lowercase; }
+hr { border: none; border-top: 3px dashed var(--border); margin: 40px 0; }

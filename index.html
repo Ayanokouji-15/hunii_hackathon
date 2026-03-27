@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hunii | Learning</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="theme-switch-wrapper">
+        <span style="margin-right: 10px; font-size: 0.8em;">Dark Mode</span>
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" onclick="toggleDark()" />
+            <div class="slider"></div>
+        </label>
+    </div>
+
+    <div class="landing-container">
+        <img src="{{ url_for('static', filename='hunii brand page.png') }}" alt="Hunii" class="brand-logo">
+        
+        <p>the peer-to-peer learning platform</p>
+        
+        <div class="actions">
+            <a href="{{ url_for('login') }}" class="btn">Login</a>
+            <a href="{{ url_for('register') }}" class="btn-secondary">Register</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleDark() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+</body>
+</html>

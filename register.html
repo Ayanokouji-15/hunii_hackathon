@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hunii | Join Us</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesd.css') }}">
+</head>
+<body>
+    <div class="theme-switch-wrapper">
+        <span>Dark Mode</span>
+        <label class="switch">
+            <input type="checkbox" id="theme-checkbox" onclick="toggleDark()">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="landing-container">
+        <div class="table-container" style="max-width: 450px;">
+            <h1>join hunii</h1>
+            <p>Start your peer-learning journey.</p>
+            
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}{% for m in messages %}<p style="color: #ff4d4d; font-weight:bold;">{{ m }}</p>{% endfor %}{% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <label style="display:block; text-align:left; margin-bottom:5px;">Username</label>
+                <input type="text" name="username" required>
+
+                <label style="display:block; text-align:left; margin-bottom:5px;">Password</label>
+                <input type="password" name="password" required>
+
+                <label style="display:block; text-align:left; margin-bottom:5px;">I am a...</label>
+                <select name="role">
+                    <option value="student">Student (Apprentice)</option>
+                    <option value="instructor">Instructor (Mentor)</option>
+                </select>
+
+                <button type="submit" style="width: 100%; margin-top: 10px;">Sign Up</button>
+            </form>
+            
+            <p style="margin-top: 20px;">Already have an account? <a href="{{ url_for('login') }}" class="btn-secondary" style="margin:0;">Login here</a></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleDark() {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+        }
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark-mode");
+            document.getElementById("theme-checkbox").checked = true;
+        }
+    </script>
+</body>
+</html>

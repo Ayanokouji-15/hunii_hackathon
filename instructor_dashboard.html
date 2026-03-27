@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hunii | Instructor Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesd.css') }}">
+</head>
+<body>
+
+    <div class="theme-switch-wrapper">
+        <span>Dark Mode</span>
+        <label class="switch">
+            <input type="checkbox" id="theme-checkbox" onclick="toggleDark()">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="dashboard-container">
+        
+        <header style="margin-bottom: 40px;">
+            <h1>hunii</h1>
+            <p>Instructor Panel: Logged in as <strong>{{ session['username'] }}</strong></p>
+        </header>
+
+        <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
+            <div class="table-container" style="flex: 1; min-width: 200px; padding: 20px; text-align: center;">
+                <h4 style="margin: 0; color: var(--accent);">Total Requests</h4>
+                <p style="font-size: 2.5rem; margin: 10px 0; font-weight: 900;">{{ total_pending }}</p>
+            </div>
+
+            <div class="table-container" style="flex: 1; min-width: 200px; padding: 20px; text-align: center; border-color: #ffb3b3;">
+                <h4 style="margin: 0; color: #ff4d4d;">Inclusive Support</h4>
+                <p style="font-size: 2.5rem; margin: 10px 0; font-weight: 900; color: #ff4d4d;">{{ inclusive_count }}</p>
+            </div>
+        </div>
+
+        <section class="table-container">
+            <h3>🔥 Trending Topics</h3>
+            <div style="margin-top: 15px;">
+                {% for topic in hot_topics %}
+                    <div style="margin-bottom: 10px; font-size: 1.1rem;">
+                        <strong>{{ topic['topic_name'] }}</strong> 
+                        <span style="margin-left: 10px; filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.1));">
+                            {{ "🔥" * topic['count'] }}
+                        </span>
+                    </div>
+                {% endfor %}
+                {% if not hot_topics %}
+                    <p style="color: #999;">No active trends yet.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="table-container">
+            <h3>Inclusive Student Lobby</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 20px; opacity: 0.8;">Priority is given to requests requiring inclusive support.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Topic</th>
+                        <th>Student</th>
+                        <th>Needs</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in requests %}
+                    {% set display_tags = r.tags if r.tags else "" %}
+                    {% set is_priority = 'Support' in display_tags or 'Low-Data' in display_tags or 'ADHD' in display_tags %}
+                    
+                    <tr style="{% if is_priority %}background-color: rgba(255, 77, 77, 0.05);{% endif %}">
+                        <td><strong>{{ r.topic_name }}</strong></td>
+                        <td>{{ r.username }}</td>
+                        <td>
+                            {% if display_tags %}
+                                {% for tag in display_tags.split(',') %}
+                                    {% set clean_tag = tag.strip() %}
+                                    {% set tag_urgent = 'Support' in clean_tag or 'Low-Data' in clean_tag or 'ADHD' in clean_tag %}
+                                    <span style="display: inline-block; padding: 4px 10px; margin: 2px; border-radius: 12px; font-size: 0.75rem; 
+                                                 background-color: {{ '#ff4d4d' if tag_urgent else 'var(--accent-light)' }}; 
+                                                 color: {{ 'white' if tag_urgent else '#333' }}; font-weight: bold;">
+                                        {{ clean_tag }}
+                                    </span>
+                                {% endfor %}
+                            {% else %}
+                                <small style="color: #999;">Regular</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('prepare_session', request_id=r.request_id) }}" class="btn" style="padding: 8px 15px; font-size: 0.8rem;">Accept</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4">No pending requests.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="table-container">
+            <h3>Scheduled Tutorial Sessions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Topic</th>
+                        <th>Date/Time</th>
+                        <th>Attendance</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in scheduled %}
+                    <tr>
+                        <td>{{ s.topic_name }}</td>
+                        <td><small>{{ s.date_time }}</small></td>
+                        <td><strong>{{ s.current_enrollment }}</strong> Students</td>
+                        <td>
+                            <a href="{{ s.zoom_link }}" target="_blank" class="btn" style="padding: 8px 15px; font-size: 0.8rem;">Open Zoom</a>
+                            <form action="{{ url_for('instructor_withdraw', session_id=s.session_id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn-logout" style="padding: 6px 15px; font-size: 0.75rem; border-color: orange; color: orange;"
+                                    onclick="return confirm('Withdraw from this session?')">Withdraw</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <div style="text-align: center; margin-top: 50px;">
+            <a href="{{ url_for('logout') }}" class="btn-logout">Logout Account</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleDark() {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+        }
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark-mode");
+            document.getElementById("theme-checkbox").checked = true;
+        }
+    </script>
+</body>
+</html>
